@@ -71,8 +71,8 @@ class WC_Photography_Admin_Settings {
 						'label'       => __( 'Collections Lightbox size:', 'woocommerce-photography' ),
 						'description' => '',
 						'default'     => array(
-							'width'  => 600,
-							'height' => 600,
+							'width'  => 1000,
+							'height' => 1000,
 							'crop'   => false
 						)
 					)
