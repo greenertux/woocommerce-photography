@@ -99,15 +99,23 @@ class WC_Photography_Ajax {
 			$collections = array();
 		}
 
+		if ( isset( $_POST['sku_pattern'] ) && '' != $_POST['sku_pattern'] ) {
+			$sku_pattern = $wpdb->esc_like( $_POST['sku_pattern'] );
+			$last_sku = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $sku_pattern . '%' ) );
+			$_sku = absint( str_replace( $sku_pattern, '', $last_sku ) );
+			$_sku++;
+			$sku = $sku_pattern . $_sku;
+		}
+
 		$image_metadata = wp_get_attachment_metadata( $image_id );
 		if ( ! empty( $image_metadata['image_meta']['title'] ) ) {
 			$title = $image_metadata['image_meta']['title'];
 		} else if ( ! empty( $collections ) ) {
 			$first_collection = current( $collections );
 
-			$title = sprintf( __( 'Photography #%d from %s', 'woocommerce-photography' ), $image_id, $first_collection );
+			$title = sprintf( __( 'Photography #%d from %s', 'woocommerce-photography' ), $_sku, $first_collection );
 		} else {
-			$title = sprintf( __( 'Photography #%d', 'woocommerce-photography' ), $image_id );
+			$title = sprintf( __( 'Photography #%d', 'woocommerce-photography' ), $_sku );
 		}
 
 		$args = array(
@@ -139,12 +147,6 @@ class WC_Photography_Ajax {
 
 		// Sku.
 		if ( isset( $_POST['sku_pattern'] ) && '' != $_POST['sku_pattern'] ) {
-			$sku_pattern = $wpdb->esc_like( $_POST['sku_pattern'] );
-			$last_sku = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $sku_pattern . '%' ) );
-			$_sku = absint( str_replace( $sku_pattern, '', $last_sku ) );
-			$_sku++;
-			$sku = $sku_pattern . $_sku;
-
 			add_post_meta( $id, '_sku', $sku );
 		}
 
