@@ -104,7 +104,7 @@ class WC_Photography_Ajax {
 			$last_sku = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $sku_pattern . '%' ) );
 			$_sku = absint( str_replace( $sku_pattern, '', $last_sku ) );
 			$_sku++;
-			$sku = $sku_pattern . $_sku;
+			$sku = $sku_pattern . str_pad($_sku, 4, '0', STR_PAD_LEFT);
 		}
 
 		$image_metadata = wp_get_attachment_metadata( $image_id );
