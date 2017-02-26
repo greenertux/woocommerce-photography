@@ -1,5 +1,9 @@
 *** WooCommerce Photography Changelog ***
 
+2017.02.22 - version 1.0.8
+* Fix - Update for WooCommerce 2.7 compatibility.
+* Fix - Issue where photos were not appearing in search.
+
 2016.01.19 - version 1.0.7
 * Fix - Compatibility with the TwentySixteen theme on WooCommerce 2.4 or below.
 

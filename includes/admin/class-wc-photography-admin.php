@@ -109,7 +109,7 @@ class WC_Photography_Admin {
 		global $submenu_file;
 		$screen = get_current_screen();
 
-		if ( 'images_collections' == $screen->taxonomy && $parent_file == 'edit.php?post_type=product' ) {
+		if ( 'images_collections' === $screen->taxonomy && 'edit.php?post_type=product' === $parent_file ) {
 			$parent_file = 'wc-photography';
 			$submenu_file = 'edit-tags.php?taxonomy=images_collections&post_type=product';
 		}
@@ -175,7 +175,7 @@ class WC_Photography_Admin {
 			'filters'             => array(
 				array(
 					'title'      => __( 'Allowed Files', 'woocommerce-photography' ),
-					'extensions' => 'jpg,jpeg,gif,png'
+					'extensions' => 'jpg,jpeg,gif,png',
 				),
 			),
 			'multipart'           => true,
@@ -185,9 +185,9 @@ class WC_Photography_Admin {
 				'_wpnonce' => wp_create_nonce( 'media-form' ),
 				'type'     => '',
 				'tab'      => '',
-				'short'    => 3
+				'short'    => 3,
 			),
-			'resize'              => false
+			'resize'              => false,
 		);
 
 		if ( wp_is_mobile() ) {
@@ -195,21 +195,6 @@ class WC_Photography_Admin {
 		}
 
 		return apply_filters( 'plupload_init', $args );
-	}
-
-	/**
-	 * Enqueue Select2.
-	 *
-	 * @return void
-	 */
-	private function enqueue_select2() {
-		if ( version_compare( WOOCOMMERCE_VERSION, '2.3.0', '<' ) ) {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-			wp_enqueue_script( 'select2', WC_Photography::get_assets_url() . 'js/select2/select2' . $suffix . '.js', array( 'jquery' ), '3.5.1', true );
-			wp_enqueue_style( 'select2-styles', WC_Photography::get_assets_url() . 'css/select2.css', array(), WC_Photography::VERSION );
-		}
-
-		wp_enqueue_style( 'wc-photography-collections-field-styles', WC_Photography::get_assets_url() . 'css/collections-field.css', array(), WC_Photography::VERSION );
 	}
 
 	/**
@@ -236,7 +221,7 @@ class WC_Photography_Admin {
 			wp_enqueue_script( 'accounting' );
 
 			// Batch upload.
-			$this->enqueue_select2();
+			wp_enqueue_style( 'wc-photography-collections-field-styles', WC_Photography::get_assets_url() . 'css/collections-field.css', array(), WC_Photography::VERSION );
 			wp_enqueue_script( 'wc-photography-batch-upload', WC_Photography::get_assets_url() . 'js/admin/batch-upload' . $suffix . '.js', array( 'jquery', 'plupload-handlers', 'jquery-ui-sortable', 'accounting', 'underscore', 'select2' ), WC_Photography::VERSION, true );
 			wp_enqueue_style( 'wc-photography-batch-upload', WC_Photography::get_assets_url() . 'css/batch-upload.css', array(), WC_Photography::VERSION, 'all' );
 
@@ -261,14 +246,15 @@ class WC_Photography_Admin {
 					'search_placeholder'       => __( 'Search for a collection&hellip;', 'woocommerce-photography' ),
 					'loading'                  => __( 'Loading&hellip;', 'woocommerce-photography' ),
 					'collection_error'         => __( 'An error occurred while creating the collection! Please try again.', 'woocommerce-photography' ),
-					'edit_success_message'     => __( 'Photographs edited successfully!', 'woocommerce-photography' )
+					'edit_success_message'     => __( 'Photographs edited successfully!', 'woocommerce-photography' ),
+					'isLessThanWC27'           => version_compare( WC_VERSION, '2.7', '<' ),
 				)
 			);
-		}
+		} // End if().
 
 		// User screen
 		if ( 'user' == $screen->id && 'add' == $screen->action || 'profile' == $screen->id || 'user-edit' == $screen->id ) {
-			$this->enqueue_select2();
+			wp_enqueue_style( 'wc-photography-collections-field-styles', WC_Photography::get_assets_url() . 'css/collections-field.css', array(), WC_Photography::VERSION );
 			wp_enqueue_script( 'wc-photography-customers', WC_Photography::get_assets_url() . 'js/admin/customers' . $suffix . '.js', array( 'jquery', 'select2' ), WC_Photography::VERSION, true );
 			wp_enqueue_style( 'woocommerce-admin-styles', WC()->plugin_url() . '/assets/css/admin.css' );
 
@@ -281,7 +267,8 @@ class WC_Photography_Admin {
 					'add_collection_nonce'     => wp_create_nonce( 'wc_photography_add_collection_nonce' ),
 					'search_placeholder'       => __( 'Search for a collection&hellip;', 'woocommerce-photography' ),
 					'loading'                  => __( 'Loading&hellip;', 'woocommerce-photography' ),
-					'collection_error'         => __( 'An error occurred while creating the collection! Please try again.', 'woocommerce-photography' )
+					'collection_error'         => __( 'An error occurred while creating the collection! Please try again.', 'woocommerce-photography' ),
+					'isLessThanWC27'           => version_compare( WC_VERSION, '2.7', '<' ),
 				)
 			);
 		}
@@ -301,7 +288,7 @@ class WC_Photography_Admin {
 				array(
 					'upload_title' => __( 'Choose an image', 'woocommerce-photography' ),
 					'upload_use'   => __( 'Use image', 'woocommerce-photography' ),
-					'placeholder'  => wc_placeholder_img_src()
+					'placeholder'  => wc_placeholder_img_src(),
 				)
 			);
 		}
@@ -358,8 +345,8 @@ class WC_Photography_Admin {
 
 		$price_changed = false;
 
-		$old_regular_price = $product->regular_price;
-		$old_sale_price    = $product->sale_price;
+		$old_regular_price = $product->get_regular_price();
+		$old_sale_price    = $product->get_sale_price();
 
 		// copy from subs & wc-admin-post-types
 		// see https://github.com/woothemes/woocommerce/pull/9684
@@ -392,11 +379,16 @@ class WC_Photography_Admin {
 
 			if ( isset( $new_price ) && $new_price != $old_regular_price ) {
 				$price_changed = true;
-				update_post_meta( $product->id, '_regular_price', $new_price );
-				update_post_meta( $product->id, '_subscription_price', $new_price );
-				$product->regular_price = $new_price;
+				update_post_meta( $product->get_id(), '_regular_price', $new_price );
+				update_post_meta( $product->get_id(), '_subscription_price', $new_price );
+
+				if ( version_compare( WC_VERSION, '2.7', '<' ) ) {
+					$product->regular_price = $new_price;
+				} else {
+					$product->set_regular_price( $new_price );
+				}
 			}
-		}
+		} // End if().
 
 		if ( ! empty( $_REQUEST['change_sale_price'] ) && isset( $_REQUEST['_sale_price'] ) ) {
 
@@ -426,33 +418,42 @@ class WC_Photography_Admin {
 				case 4 :
 					if ( strstr( $sale_price, '%' ) ) {
 						$percent = str_replace( '%', '', $sale_price ) / 100;
-						$new_price = $product->regular_price - ( $product->regular_price * $percent );
+						$new_price = $product->get_regular_price() - ( $product->get_regular_price() * $percent );
 					} else {
-						$new_price = $product->regular_price - $sale_price;
+						$new_price = $product->get_regular_price() - $sale_price;
 					}
 				break;
 			}
 
 			if ( isset( $new_price ) && $new_price != $old_sale_price ) {
 				$price_changed = true;
-				update_post_meta( $product->id, '_sale_price', $new_price );
-				$product->sale_price = $new_price;
+				update_post_meta( $product->get_id(), '_sale_price', $new_price );
+				if ( version_compare( WC_VERSION, '2.7', '<' ) ) {
+					$product->sale_price = $new_price;
+				} else {
+					$product->set_sale_price( $new_price );
+				}
 			}
-		}
+		} // End if().
 
 		if ( $price_changed ) {
-			update_post_meta( $product->id, '_sale_price_dates_from', '' );
-			update_post_meta( $product->id, '_sale_price_dates_to', '' );
+			update_post_meta( $product->get_id(), '_sale_price_dates_from', '' );
+			update_post_meta( $product->get_id(), '_sale_price_dates_to', '' );
 
-			if ( $product->regular_price < $product->sale_price ) {
-				$product->sale_price = '';
-				update_post_meta( $product->id, '_sale_price', '' );
+			if ( $product->get_regular_price() < $product->get_sale_price() ) {
+				if ( version_compare( WC_VERSION, '2.7', '<' ) ) {
+					$product->sale_price = '';
+				} else {
+					$product->set_sale_price( '' );
+				}
+
+				update_post_meta( $product->get_id(), '_sale_price', '' );
 			}
 
-			if ( $product->sale_price ) {
-				update_post_meta( $product->id, '_price', $product->sale_price );
+			if ( $product->get_sale_price() ) {
+				update_post_meta( $product->get_id(), '_price', $product->get_sale_price() );
 			} else {
-				update_post_meta( $product->id, '_price', $product->regular_price );
+				update_post_meta( $product->get_id(), '_price', $product->get_regular_price() );
 			}
 		}
 

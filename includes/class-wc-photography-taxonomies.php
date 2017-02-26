@@ -30,7 +30,6 @@ class WC_Photography_Taxonomies {
 
 		$args = apply_filters( 'wc_photography_collections_taxonomy_args', array(
 			'hierarchical'          => true,
-			'update_count_callback' => '_wc_term_recount',
 			'label'                 => __( 'Photography Collections', 'woocommerce-photography' ),
 			'labels' => array(
 				'name'              => __( 'Photography Collections', 'woocommerce-photography' ),
@@ -45,7 +44,7 @@ class WC_Photography_Taxonomies {
 				'parent_item'       => __( 'Parent Photography Collection', 'woocommerce-photography' ),
 				'parent_item_colon' => __( 'Parent Photography Collection:', 'woocommerce-photography' ),
 				'search_items'      => __( 'Search Photography Collections', 'woocommerce-photography' ),
-				'not_found'         => __( 'No Photography Collections found', 'woocommerce-photography' )
+				'not_found'         => __( 'No Photography Collections found', 'woocommerce-photography' ),
 			),
 			'query_var'             => true,
 			'show_ui'               => true,

@@ -40,7 +40,12 @@
 				target = $( '.wc-photography-collections-select' );
 			}
 
-			target.select2({
+			// Triger change for already enhanced selects
+			target.trigger( 'change.select2' );
+
+			target = $( target ).filter( ':not(.enhanced)' );
+
+			var select2_args = {
 				placeholder: WCPhotographyBatchUploadParams.search_placeholder,
 				minimumInputLength: 2,
 				multiple: true,
@@ -50,38 +55,34 @@
 					quietMillis: 200,
 					data: function ( term ) {
 						return {
-							term: term,
+							term: WCPhotographyBatchUploadParams.isLessThanWC27 ? term : term.term,
 							action: 'wc_photography_search_collections',
 							security: WCPhotographyBatchUploadParams.search_collections_nonce
 						};
 					},
-					results: function ( data ) {
+					processResults: function ( data ) {
 						return {
 							results: data
 						};
 					}
-				},
-				initSelection: function( element, callback ) {
+				}
+			};
+
+			if ( WCPhotographyBatchUploadParams.isLessThanWC27 ) {
+				select2_args.initSelection = function( element, callback ) {
 					var data = $.parseJSON( element.attr( 'data-selected' ) );
 
 					return callback( data );
-				},
-				formatSelection: function( data ) {
-					return '<div class="selected-option" data-id="' + data.id + '">' + data.text + '</div>';
-				}
-			});
-		}
+				};
 
-		/**
-		 * Set the Select2 when add new photographs.
-		 */
-		function collectionsSelectReset( target ) {
-			if ( ! target ) {
-				target = $( '.wc-photography-collections-select' );
+				select2_args.formatSelection = function( data ) {
+					return '<div class="selected-option" data-id="' + data.id + '">' + data.text + '</div>';
+				};
+
+				select2_args.ajax.results = select2_args.ajax.processResults;
 			}
 
-			target.select2( 'destroy' );
-			initCollectionsSelect( target );
+			target.select2( select2_args ).addClass( 'enhanced' );
 		}
 
 		initCollectionsSelect();
@@ -145,6 +146,19 @@
 		});
 
 		WCPhotographyBatchUpload.bind( 'fileUploaded', function( upload, file, info ) {
+			var collections = $( '#wc-photography-batch-collection' );
+
+			if ( WCPhotographyBatchUploadParams.isLessThanWC27 ) {
+				collections = collections.val();
+			} else {
+				var tmp = collections.select2('data');
+				collections = [];
+				tmp.forEach( function (obj) {
+					collections.push( obj.id );
+				} );
+				collections = collections.join( ',' );
+			}
+
 			$.ajax({
 				url:      WCPhotographyBatchUploadParams.ajax_url,
 				data:     {
@@ -153,7 +167,7 @@
 					image_id:    info.response,
 					sku_pattern: $( '#wc-photography-batch-sku' ).val(),
 					price:       accounting.unformat( $( '#wc-photography-batch-price' ).val(), woocommerce_admin.mon_decimal_point ),
-					collections: $( '#wc-photography-batch-collection' ).val()
+					collections: collections,
 				},
 				type:     'POST',
 				dataType: 'json',
@@ -164,7 +178,7 @@
 
 					response.index = photographyIndex;
 					$( '#wc-photography-image-edit .wc-metaboxes' ).append( template( response ) );
-					collectionsSelectReset();
+					initCollectionsSelect();
 
 					photographyIndex++;
 				}
@@ -365,33 +379,40 @@
 
 					// Show the response.
 					if ( response.success ) {
-						var select = $( 'input.wc-photography-collections-select', wrap ),
-							items  = [],
-							values = [];
+						if ( WCPhotographyBatchUploadParams.isLessThanWC27 ) {
+							var select = $( 'input.wc-photography-collections-select', wrap ),
+								items  = [],
+								values = [];
 
-						// Include the new collection.
-						$( '.selected-option', wrap ).each( function( index, val ) {
-							var current = $( val );
+							// Include the new collection.
+							$( '.selected-option', wrap ).each( function( index, val ) {
+								var current = $( val );
 
-							items.push({
-								id: current.attr( 'data-id' ),
-								text: current.text()
+								items.push({
+									id: current.attr( 'data-id' ),
+									text: current.text()
+								});
+
+								values.push( current.attr( 'data-id' ) );
 							});
 
-							values.push( current.attr( 'data-id' ) );
-						});
+							items.push( response.data );
+							values.push( response.data.id );
 
-						items.push( response.data );
-						values.push( response.data.id );
+							select
+								.attr( 'data-selected', JSON.stringify( items ) )
+								.val( values.toString() );
 
-						select
-							.attr( 'data-selected', JSON.stringify( items ) )
-							.val( values.toString() );
+							initCollectionsSelect( select );
 
-						collectionsSelectReset( select );
-
-						// Toggle the add new collections field.
-						$( '.fields', wrap ).toggle();
+							// Toggle the add new collections field.
+							$( '.fields', wrap ).toggle();
+						} else {
+							var select = $( '.wc-photography-collections-select' );
+							var option = new Option( response.data.text, response.data.id );
+							option.selected = true;
+							select.append( option );
+						}
 					} else {
 						button.after( '<div class="error inline message">' + WCPhotographyBatchUploadParams.collection_error + '</div>' );
 					}

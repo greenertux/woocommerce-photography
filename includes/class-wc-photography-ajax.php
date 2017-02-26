@@ -85,37 +85,34 @@ class WC_Photography_Ajax {
 		$image_id = absint( $_POST['image_id'] );
 		$sku      = '';
 
+		$collections = array();
+
 		// Get the collections.
-		if ( isset( $_POST['collections'] ) && '' != $_POST['collections'] ) {
-			$_collections = explode( ',', $_POST['collections'] );
-			$_collections = array_map( 'absint', $_collections );
-			$collections  = array();
+		if ( isset( $_POST['collections'] ) ) {
+			if ( is_array( $_POST['collections'] ) ) {
+				$collections = array_map( 'absint', $_POST['collections'] );
+			} elseif ( '' != $_POST['collections'] ) {
+				$_collections = explode( ',', $_POST['collections'] );
+				$_collections = array_map( 'absint', $_collections );
 
-			foreach ( $_collections as $collection_id ) {
-				$collection = get_term( $collection_id, 'images_collections' );
-				$collections[ $collection_id ] = $collection->name;
+				foreach ( $_collections as $collection_id ) {
+					$collection = get_term( $collection_id, 'images_collections' );
+					$collections[ $collection_id ] = $collection->name;
+				}
 			}
-		} else {
-			$collections = array();
-		}
-
-		if ( isset( $_POST['sku_pattern'] ) && '' != $_POST['sku_pattern'] ) {
-			$sku_pattern = $wpdb->esc_like( $_POST['sku_pattern'] );
-			$last_sku = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $sku_pattern . '%' ) );
-			$_sku = absint( str_replace( $sku_pattern, '', $last_sku ) );
-			$_sku++;
-			$sku = $sku_pattern . str_pad($_sku, 4, '0', STR_PAD_LEFT);
 		}
 
 		$image_metadata = wp_get_attachment_metadata( $image_id );
 		if ( ! empty( $image_metadata['image_meta']['title'] ) ) {
 			$title = $image_metadata['image_meta']['title'];
-		} else if ( ! empty( $collections ) ) {
+		} elseif ( ! empty( $collections ) ) {
 			$first_collection = current( $collections );
 
-			$title = sprintf( __( 'Photography #%d from %s', 'woocommerce-photography' ), $_sku, $first_collection );
+			/* translators: 1: image id 2: first collection name */
+			$title = sprintf( __( 'Photography #%1$d from %2$s', 'woocommerce-photography' ), $image_id, $first_collection );
 		} else {
-			$title = sprintf( __( 'Photography #%d', 'woocommerce-photography' ), $_sku );
+			/* translators: 1: image id */
+			$title = sprintf( __( 'Photography #%d', 'woocommerce-photography' ), $image_id );
 		}
 
 		$args = array(
@@ -147,6 +144,12 @@ class WC_Photography_Ajax {
 
 		// Sku.
 		if ( isset( $_POST['sku_pattern'] ) && '' != $_POST['sku_pattern'] ) {
+			$sku_pattern = $wpdb->esc_like( $_POST['sku_pattern'] );
+			$last_sku = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $sku_pattern . '%' ) );
+			$_sku = absint( str_replace( $sku_pattern, '', $last_sku ) );
+			$_sku++;
+			$sku = $sku_pattern . $_sku;
+
 			add_post_meta( $id, '_sku', $sku );
 		}
 
@@ -164,12 +167,6 @@ class WC_Photography_Ajax {
 
 			wp_set_object_terms( $id, $_collections, 'images_collections' );
 		}
-		
-		//Add gravity form
-                add_post_meta( $id, '_gravity_form_data', 'todo');
-                //add_post_meta( $id, '_product_addons', 'todo');
-                //add_post_meta( $id, '_product_addons_exclude_global', '0');
-                
 
 		// Default options.
 		add_post_meta( $id, '_visibility', 'visible' );
@@ -191,11 +188,9 @@ class WC_Photography_Ajax {
 			'collections_ids' => implode( ',', array_keys( $collections ) ),
 			'collections'     => $collections,
 			'price'           => $regular_price,
-			'sku'             => $sku
+			'sku'             => $sku,
 		) );
-                global $wpdb;
-                $wpdb->update('wp_postmeta', array( 'meta_value' => 'a:15:{s:2:"id";s:1:"3";s:13:"display_title";b:0;s:19:"display_description";b:0;s:25:"disable_woocommerce_price";s:2:"no";s:12:"price_before";s:0:"";s:11:"price_after";s:0:"";s:20:"disable_calculations";s:2:"no";s:22:"disable_label_subtotal";s:3:"yes";s:21:"disable_label_options";s:3:"yes";s:19:"disable_label_total";s:3:"yes";s:14:"disable_anchor";s:2:"no";s:14:"label_subtotal";s:8:"Subtotal";s:13:"label_options";s:7:"Options";s:11:"label_total";s:5:"Total";s:8:"use_ajax";s:2:"no";}'), array( 'meta_key' => '_gravity_form_data', 'meta_value' => 'todo'));
-                //$wpdb->update('wp_postmeta', array( 'meta_value' => 'a:0:{}'), array( 'meta_key' => '_product_addons', 'meta_value' => 'todo'));
+
 		wp_send_json( $response );
 	}
 
@@ -245,14 +240,18 @@ class WC_Photography_Ajax {
 				wp_update_post( array( 'ID' => $image_id, 'post_content' => $caption, 'post_excerpt' => $caption ) );
 			}
 
-			if ( isset( $image['collections'] ) && '' != $image['collections'] ) {
-				$_collections = explode( ',', $image['collections'] );
-				$_collections = array_map( 'absint', $_collections );
+			$collections = array();
 
-				wp_set_object_terms( $image_id, $_collections, 'images_collections' );
-			} else {
-				wp_set_object_terms( $image_id, array(), 'images_collections' );
+			if ( isset( $image['collections'] ) ) {
+				if ( is_array( $image['collections'] ) ) {
+					$collections = array_map( 'absint', $image['collections'] );
+				} elseif ( '' != $image['collections'] ) {
+					$collections = explode( ',', $image['collections'] );
+					$collections = array_map( 'absint', $collections );
+				}
 			}
+
+			wp_set_object_terms( $image_id, $collections, 'images_collections' );
 
 			/**
 			 * Allows save custom fields.
@@ -261,7 +260,7 @@ class WC_Photography_Ajax {
 			 * @param array $image    Image fields.
 			 */
 			do_action( 'wc_photography_save_image_ajax', $image_id, $image );
-		}
+		} // End foreach().
 	}
 
 	/**

@@ -184,7 +184,7 @@ if ( ! function_exists( 'wc_photography_my_account_list' ) ) {
 			wc_get_template(
 				'myaccount/my-collections.php',
 				array(
-					'collections' => $collections
+					'collections' => $collections,
 				),
 				'woocommerce/',
 				WC_Photography::get_templates_path()
@@ -220,7 +220,7 @@ if ( ! function_exists( 'wc_photography_template_show_collections' ) ) {
 	function wc_photography_template_show_collections() {
 		global $post, $product;
 
-		if ( 'photography' == $product->product_type ) {
+		if ( $product->is_type( 'photography' ) ) {
 			$collection_count = sizeof( get_the_terms( $post->ID, 'images_collections' ) );
 
 			echo $product->get_collections( ', ', '<span class="collections">' . _n( 'Collection:', 'Collection:', $collection_count, 'woocommerce-photography' ) . ' ', '.</span>' );

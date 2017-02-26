@@ -130,7 +130,7 @@ class WC_Email_Photography_New_Collection extends WC_Email {
 	public function get_content_html() {
 		ob_start();
 
-		woocommerce_get_template(
+		wc_get_template(
 			$this->template_html,
 			array(
 				'customer'      => $this->object,
@@ -154,7 +154,7 @@ class WC_Email_Photography_New_Collection extends WC_Email {
 	public function get_content_plain() {
 		ob_start();
 
-		woocommerce_get_template(
+		wc_get_template(
 			$this->template_plain,
 			array(
 				'customer'      => $this->object,

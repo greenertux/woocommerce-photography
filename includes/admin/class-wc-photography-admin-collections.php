@@ -16,7 +16,6 @@ class WC_Photography_Admin_Collections {
 	 * Initialize the admin collections actions.
 	 */
 	public function __construct() {
-		add_action( 'delete_term', array( $this, 'delete_term' ), 5 );
 		add_action( 'images_collections_add_form_fields', array( $this, 'collections_add_fields' ) );
 		add_action( 'images_collections_edit_form_fields', array( $this, 'collections_edit_fields' ), 10, 2 );
 		add_action( 'created_term', array( $this, 'save_collections_fields' ), 10, 3 );
@@ -24,25 +23,6 @@ class WC_Photography_Admin_Collections {
 		add_filter( 'manage_edit-images_collections_columns', array( $this, 'collections_columns' ) );
 		add_filter( 'manage_images_collections_custom_column', array( $this, 'collections_column' ), 10, 3 );
 		add_filter( 'images_collections_row_actions', array( $this, 'collections_actions' ), 10, 2 );
-	}
-
-	/**
-	 * When a term is deleted, delete its meta.
-	 *
-	 * @param int $term_id
-	 *
-	 * @return void
-	 */
-	public function delete_term( $term_id ) {
-		$term_id = intval( $term_id );
-
-		if ( ! $term_id ) {
-			return;
-		}
-
-		global $wpdb;
-
-		$wpdb->query( "DELETE FROM {$wpdb->woocommerce_termmeta} WHERE `woocommerce_term_id` = " . $term_id );
 	}
 
 	/**
@@ -147,6 +127,7 @@ class WC_Photography_Admin_Collections {
 		if ( 'actions' == $column ) {
 			$collection = get_term( $id, 'images_collections' );
 
+			/* translators: 1: number of products */
 			$columns .= '<a class="button-secondary" href="edit.php?images_collections=' . esc_attr( $collection->slug ) . '&post_type=product" title="' . __( 'View products on this collection.', 'woocommerce-photography' ) . '">' . sprintf( __( 'View Products (%d)', 'woocommerce-photography' ), $collection->count ) . '</a>';
 			$columns .= ' <a class="button-secondary" href="' . get_term_link( $collection ) . '" title="' . __( 'View collection page.', 'woocommerce-photography' ) . '">' . __( 'View Collection', 'woocommerce-photography' ) . '</a>';
 		}

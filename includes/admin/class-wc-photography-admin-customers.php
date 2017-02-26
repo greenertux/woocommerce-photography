@@ -41,11 +41,11 @@ class WC_Photography_Admin_Customers {
 
 			foreach ( $_collections as $collection_id ) {
 				$collection = get_term( $collection_id, 'images_collections' );
-				
+
 				if ( ! is_object( $collection ) ) {
 					continue;
 				}
-				
+
 				$collections[ $collection_id ] = html_entity_decode( $collection->name );
 			}
 		}
@@ -65,9 +65,16 @@ class WC_Photography_Admin_Customers {
 			return false;
 		}
 
+		$collections = array();
+
 		if ( isset( $_POST['collections'] ) ) {
-			$collections = explode( ',', $_POST['collections'] );
-			$collections = array_filter( array_map( 'absint', $collections ) );
+
+			if ( is_array( $_POST['collections'] ) ) {
+				$collections = array_map( 'absint', $_POST['collections'] );
+			} elseif ( '' != $_POST['collections'] ) {
+				$collections = explode( ',', $_POST['collections'] );
+				$collections = array_filter( array_map( 'absint', $collections ) );
+			}
 
 			// Test for new collections and send the notification.
 			$old_collections = get_user_meta( $user_id, '_wc_photography_collections', true );
@@ -77,11 +84,9 @@ class WC_Photography_Admin_Customers {
 			if ( $new_collections ) {
 				$this->trigger_new_collection_notification( $user_id, $new_collections );
 			}
-
-			update_user_meta( $user_id, '_wc_photography_collections', $collections );
-		} else {
-			update_user_meta( $user_id, '_wc_photography_collections', array() );
 		}
+
+		update_user_meta( $user_id, '_wc_photography_collections', $collections );
 	}
 
 	/**

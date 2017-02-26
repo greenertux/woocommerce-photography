@@ -52,13 +52,15 @@ class WC_Photography_Products {
 			return;
 		}
 
-		if ( $this->is_catalog_page() ) {
-			$query->set( 'tax_query', array( array(
-				'taxonomy' => 'product_type',
-				'field'    => 'slug',
-				'terms'    => array( 'photography' ),
-				'operator' => 'NOT IN'
-			) ) );
+		if ( $this->is_catalog_page() && ! is_search() ) {
+			$query->set( 'tax_query', array(
+				array(
+					'taxonomy' => 'product_type',
+					'field'    => 'slug',
+					'terms'    => array( 'photography' ),
+					'operator' => 'NOT IN',
+				),
+			) );
 		}
 
 		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts' ) );
@@ -115,7 +117,8 @@ class WC_Photography_Products {
 			}
 
 			// Check if the current user can see the photography.
-			if ( $images_collections = get_the_terms( $post->ID, 'images_collections' ) ) {
+			$images_collections = get_the_terms( $post->ID, 'images_collections' );
+			if ( $images_collections ) {
 				$collections = array();
 
 				foreach ( $images_collections as $key => $collection ) {
@@ -138,7 +141,7 @@ class WC_Photography_Products {
 
 			wp_redirect( get_the_permalink( wc_get_page_id( 'myaccount' ) ) );
 			exit();
-		}
+		} // End if().
 
 		// Check for taxonomy page.
 		if ( is_tax( 'images_collections' ) ) {
@@ -232,13 +235,13 @@ class WC_Photography_Products {
 		$photography_thumbnail = apply_filters( 'wc_photography_get_image_size_thumbnail', array(
 			'width'  => $settings['thumbnail_image_size']['width'],
 			'height' => $settings['thumbnail_image_size']['height'],
-			'crop'   => $settings['thumbnail_image_size']['crop']
+			'crop'   => $settings['thumbnail_image_size']['crop'],
 		) );
 
 		$photography_lightbox = apply_filters( 'wc_photography_get_image_size_lightbox', array(
 			'width'  => $settings['lightbox_image_size']['width'],
 			'height' => $settings['lightbox_image_size']['height'],
-			'crop'   => $settings['lightbox_image_size']['crop']
+			'crop'   => $settings['lightbox_image_size']['crop'],
 		) );
 
 		add_image_size( 'photography_thumbnail', $photography_thumbnail['width'], $photography_thumbnail['height'], $photography_thumbnail['crop'] );
@@ -305,16 +308,12 @@ class WC_Photography_Products {
 				if ( $url ) {
 					wp_safe_redirect( $url );
 					exit;
-				}
-
-				// Redirect to cart option.
-				elseif ( 'yes' == get_option( 'woocommerce_cart_redirect_after_add' ) ) {
+				} elseif ( 'yes' == get_option( 'woocommerce_cart_redirect_after_add' ) ) { // Redirect to cart option.
 					wp_safe_redirect( WC()->cart->get_cart_url() );
 					exit;
 				}
-
 			}
-		}
+		} // End if().
 	}
 
 	/**
