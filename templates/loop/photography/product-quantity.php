@@ -9,23 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $product;
 
-if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '2.3', '>=' ) ) {
-	$class = '';
-} else {
-	$class = ' legacy-quantity';
-}
-
 ?>
 
-<div class="photography-quantity<?php echo $class; ?>">
-
-<?php
-	woocommerce_quantity_input( array(
-		'input_name'  => 'quantity[' . $product->get_id() . ']',
-		'input_value' => apply_filters( 'wc_photography_quantity_input_value', 0, $product ),
-		'min_value'   => apply_filters( 'wc_photography_quantity_input_min', 0, $product ),
-		'max_value'   => apply_filters( 'wc_photography_quantity_input_max', $product->backorders_allowed() ? '' : $product->get_stock_quantity(), $product ),
-	) );
-?>
-
-</div>
+<div style="text-align: center;"><a rel="nofollow" href="<?php echo $product->get_permalink(); ?>" class="button product_type_simple add_to_cart_button ajax_add_to_cart">In den Warenkorb</a></div>
