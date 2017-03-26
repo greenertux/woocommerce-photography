@@ -101,11 +101,13 @@ class WC_Photography_Ajax {
 				}
 			}
 		}
-                $sku_pattern = $wpdb->esc_like( $_POST['sku_pattern'] );
-                $last_sku = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $sku_pattern . '%' ) );
-                $_sku = absint( str_replace( $sku_pattern, '', $last_sku ) );
-                $_sku++;
-                $sku = $sku_pattern . str_pad($_sku, 4, '0', STR_PAD_LEFT);
+                if ( isset( $_POST['sku_pattern'] ) && '' != $_POST['sku_pattern'] ) {
+-			$sku_pattern = $wpdb->esc_like( $_POST['sku_pattern'] );
+-			$last_sku = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $sku_pattern . '%' ) );
+-			$_sku = absint( str_replace( $sku_pattern, '', $last_sku ) );
+-			$_sku++;
+-			$sku = $sku_pattern . str_pad($_sku, 4, '0', STR_PAD_LEFT);
+-                }
 		$image_metadata = wp_get_attachment_metadata( $image_id );
 		if ( ! empty( $image_metadata['image_meta']['title'] ) ) {
 			$title = $image_metadata['image_meta']['title'];
@@ -165,6 +167,9 @@ class WC_Photography_Ajax {
 
 			wp_set_object_terms( $id, $_collections, 'images_collections' );
 		}
+		
+                //Add gravity form
+--              add_post_meta( $id, '_gravity_form_data', 'todo');
 
 		// Default options.
 		add_post_meta( $id, '_visibility', 'visible' );
@@ -188,6 +193,10 @@ class WC_Photography_Ajax {
 			'price'           => $regular_price,
 			'sku'             => $sku,
 		) );
+		
+		// Find all products and add gravity forms data
+-		global $wpdb;
+-		$wpdb->update('wp_postmeta', array( 'meta_value' => 'a:15:{s:2:"id";s:1:"3";s:13:"display_title";b:0;s:19:"display_description";b:0;s:25:"disable_woocommerce_price";s:2:"no";s:12:"price_before";s:0:"";s:11:"price_after";s:0:"";s:20:"disable_calculations";s:2:"no";s:22:"disable_label_subtotal";s:3:"yes";s:21:"disable_label_options";s:3:"yes";s:19:"disable_label_total";s:3:"yes";s:14:"disable_anchor";s:2:"no";s:14:"label_subtotal";s:8:"Subtotal";s:13:"label_options";s:7:"Options";s:11:"label_total";s:5:"Total";s:8:"use_ajax";s:2:"no";}'), array( 'meta_key' => '_gravity_form_data', 'meta_value' => 'todo'));
 
 		wp_send_json( $response );
 	}
