@@ -38,8 +38,7 @@ get_header( 'shop' ); ?>
 
 			<?php woocommerce_product_loop_start(); ?>
 
-				<form action="" class="photography-products" method="post" enctype="multipart/form-data">
-					<?php wc_photography_collections_tools(); ?>
+
 
 						<div class="photography-products-list">
 
@@ -51,8 +50,6 @@ get_header( 'shop' ); ?>
 
 						</div>
 
-					<?php wc_photography_collections_tools(); ?>
-				</form>
 
 			<?php woocommerce_product_loop_end(); ?>
 
