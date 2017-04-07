@@ -247,7 +247,7 @@ class WC_Photography_Admin {
 					'loading'                  => __( 'Loading&hellip;', 'woocommerce-photography' ),
 					'collection_error'         => __( 'An error occurred while creating the collection! Please try again.', 'woocommerce-photography' ),
 					'edit_success_message'     => __( 'Photographs edited successfully!', 'woocommerce-photography' ),
-					'isLessThanWC27'           => version_compare( WC_VERSION, '2.7', '<' ),
+					'isLessThanWC30'           => version_compare( WC_VERSION, '3.0', '<' ),
 				)
 			);
 		} // End if().
@@ -268,7 +268,7 @@ class WC_Photography_Admin {
 					'search_placeholder'       => __( 'Search for a collection&hellip;', 'woocommerce-photography' ),
 					'loading'                  => __( 'Loading&hellip;', 'woocommerce-photography' ),
 					'collection_error'         => __( 'An error occurred while creating the collection! Please try again.', 'woocommerce-photography' ),
-					'isLessThanWC27'           => version_compare( WC_VERSION, '2.7', '<' ),
+					'isLessThanWC30'           => version_compare( WC_VERSION, '3.0', '<' ),
 				)
 			);
 		}
@@ -382,7 +382,7 @@ class WC_Photography_Admin {
 				update_post_meta( $product->get_id(), '_regular_price', $new_price );
 				update_post_meta( $product->get_id(), '_subscription_price', $new_price );
 
-				if ( version_compare( WC_VERSION, '2.7', '<' ) ) {
+				if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
 					$product->regular_price = $new_price;
 				} else {
 					$product->set_regular_price( $new_price );
@@ -428,7 +428,7 @@ class WC_Photography_Admin {
 			if ( isset( $new_price ) && $new_price != $old_sale_price ) {
 				$price_changed = true;
 				update_post_meta( $product->get_id(), '_sale_price', $new_price );
-				if ( version_compare( WC_VERSION, '2.7', '<' ) ) {
+				if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
 					$product->sale_price = $new_price;
 				} else {
 					$product->set_sale_price( $new_price );
@@ -441,7 +441,7 @@ class WC_Photography_Admin {
 			update_post_meta( $product->get_id(), '_sale_price_dates_to', '' );
 
 			if ( $product->get_regular_price() < $product->get_sale_price() ) {
-				if ( version_compare( WC_VERSION, '2.7', '<' ) ) {
+				if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
 					$product->sale_price = '';
 				} else {
 					$product->set_sale_price( '' );

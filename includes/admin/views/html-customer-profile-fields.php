@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<label for="collections"><?php _e( 'Collections', 'woocommerce-photography' ); ?></label>
 		</th>
 		<td>
-			<?php if ( version_compare( WC_VERSION, '2.7', '<' ) ) : ?>
+			<?php if ( version_compare( WC_VERSION, '3.0', '<' ) ) : ?>
 				<input type="hidden" id="collections" class="wc-photography-collections-select" name="collections" style="width: 25em;" value="<?php echo implode( ',', array_keys( $collections ) ); ?>" data-selected='[<?php
 					$total   = count( $collections );
 					$current = 0;

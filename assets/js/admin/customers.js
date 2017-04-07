@@ -26,7 +26,7 @@
 					quietMillis: 200,
 					data: function ( term ) {
 						return {
-							term: WCPhotographyCustomerParams.isLessThanWC27 ? term : term.term,
+							term: WCPhotographyCustomerParams.isLessThanWC30 ? term : term.term,
 							action: 'wc_photography_search_collections',
 							security: WCPhotographyCustomerParams.search_collections_nonce
 						};
@@ -39,7 +39,7 @@
 				}
 			};
 
-			if ( WCPhotographyCustomerParams.isLessThanWC27 ) {
+			if ( WCPhotographyCustomerParams.isLessThanWC30 ) {
 				select2_args.initSelection = function( element, callback ) {
 					var data = $.parseJSON( element.attr( 'data-selected' ) );
 
@@ -93,7 +93,7 @@
 					button.removeAttr( 'disabled' ).next( '.loading' ).remove();
 
 					if ( response.success ) {
-						if ( WCPhotographyCustomerParams.isLessThanWC27 ) {
+						if ( WCPhotographyCustomerParams.isLessThanWC30 ) {
 							var select = $( 'input.wc-photography-collections-select', wrap ),
 								items  = [],
 								values = [];

@@ -55,7 +55,7 @@
 					quietMillis: 200,
 					data: function ( term ) {
 						return {
-							term: WCPhotographyBatchUploadParams.isLessThanWC27 ? term : term.term,
+							term: WCPhotographyBatchUploadParams.isLessThanWC30 ? term : term.term,
 							action: 'wc_photography_search_collections',
 							security: WCPhotographyBatchUploadParams.search_collections_nonce
 						};
@@ -68,7 +68,7 @@
 				}
 			};
 
-			if ( WCPhotographyBatchUploadParams.isLessThanWC27 ) {
+			if ( WCPhotographyBatchUploadParams.isLessThanWC30 ) {
 				select2_args.initSelection = function( element, callback ) {
 					var data = $.parseJSON( element.attr( 'data-selected' ) );
 
@@ -148,7 +148,7 @@
 		WCPhotographyBatchUpload.bind( 'fileUploaded', function( upload, file, info ) {
 			var collections = $( '#wc-photography-batch-collection' );
 
-			if ( WCPhotographyBatchUploadParams.isLessThanWC27 ) {
+			if ( WCPhotographyBatchUploadParams.isLessThanWC30 ) {
 				collections = collections.val();
 			} else {
 				var tmp = collections.select2('data');
@@ -379,7 +379,7 @@
 
 					// Show the response.
 					if ( response.success ) {
-						if ( WCPhotographyBatchUploadParams.isLessThanWC27 ) {
+						if ( WCPhotographyBatchUploadParams.isLessThanWC30 ) {
 							var select = $( 'input.wc-photography-collections-select', wrap ),
 								items  = [],
 								values = [];

@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: WooCommerce Photography
- * Plugin URI: https://www.woothemes.com/
+ * Plugin URI: https://woocommerce.com/
  * Description: Provide a user experience for photographers to offer batches of images for order.
- * Version: 1.0.8
- * Author: WooThemes
+ * Version: 1.0.9
+ * Author: WooCommerce
  * Author URI: https://woocommerce.com
  *
  * Text Domain: woocommerce-photography
@@ -47,7 +47,7 @@ if ( ! class_exists( 'WC_Photography' ) ) :
 		 *
 		 * @var string
 		 */
-		const VERSION = '1.0.8';
+		const VERSION = '1.0.9';
 
 		/**
 		 * Instance of this class.
@@ -171,7 +171,7 @@ if ( ! class_exists( 'WC_Photography' ) ) :
 		 */
 		public function woocommerce_missing_notice() {
 			/* translators: 1: WooCommerce href html */
-			echo '<div class="error"><p>' . sprintf( __( 'WooCommerce Photography depends on the last version of %s to work!', 'woocommerce-photography' ), '<a href="http://www.woothemes.com/woocommerce/" target="_blank">' . __( 'WooCommerce', 'woocommerce-photography' ) . '</a>' ) . '</p></div>';
+			echo '<div class="error"><p>' . sprintf( __( 'WooCommerce Photography depends on the last version of %s to work!', 'woocommerce-photography' ), '<a href="https://woocommerce.com/woocommerce/" target="_blank">' . __( 'WooCommerce', 'woocommerce-photography' ) . '</a>' ) . '</p></div>';
 		}
 
 		/**
@@ -184,8 +184,8 @@ if ( ! class_exists( 'WC_Photography' ) ) :
 		public function plugin_action_links( $links ) {
 			$plugin_links = array(
 				'settings' => '<a href="' . admin_url( 'admin.php?page=wc-photography-settings' ) . '">' . __( 'Settings', 'woocommerce-photography' ) . '</a>',
-				'support'  => '<a href="https://woothemes.com/my-account/create-a-ticket/">' . __( 'Support', 'woocommerce-photography' ) . '</a>',
-				'docs'     => '<a href="http://docs.woothemes.com/documentation/woocommerce-extensions/photography/">' . __( 'Docs', 'woocommerce-photography' ) . '</a>',
+				'support'  => '<a href="https://woocommerce.com/my-account/create-a-ticket/">' . __( 'Support', 'woocommerce-photography' ) . '</a>',
+				'docs'     => '<a href="https://docs.woocommerce.com/documentation/woocommerce-extensions/photography/">' . __( 'Docs', 'woocommerce-photography' ) . '</a>',
 			);
 
 			return array_merge( $plugin_links, $links );

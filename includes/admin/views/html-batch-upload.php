@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<td class="forminp">
 						<fieldset>
 							<legend class="screen-reader-text"><span><?php _e( 'Collections', 'woocommerce-photography' ); ?></span></legend>
-							<?php if ( version_compare( WC_VERSION, '2.7', '<' ) ): ?>
+							<?php if ( version_compare( WC_VERSION, '3.0', '<' ) ): ?>
 
 								<input type="hidden" id="wc-photography-batch-collection" class="wc-photography-collections-select" name="collections" style="width: 300px;" />
 							<?php else: ?>
@@ -134,7 +134,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div class="collection-form-field">
 						<p class="form-field full">
 							<label for="photography-<%- id %>-collections"><?php _e( 'Collections', 'woocommerce-photography' ); ?></label>
-							<?php if ( version_compare( WC_VERSION, '2.7', '<' ) ): ?>
+							<?php if ( version_compare( WC_VERSION, '3.0', '<' ) ): ?>
 								<input type="hidden" id="photography-<%- id %>-collections" class="wc-photography-collections-select" name="photography[<%- id %>][collections]" style="width: 300px;" value="<%- collections_ids %>" data-selected='[<%
 								var collectionsSize = _.size( collections ),
 									current = 0;
